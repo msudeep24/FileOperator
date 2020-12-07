@@ -20,23 +20,29 @@ public class ProcesMain {
     int length;
     
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		System.out.println("Welcome to Custom File Operator created by Sudeep Mukherjee");
 		Boolean bool = true;
 		Scanner in = new Scanner(System.in);
+		Boolean subClass = false;
+		Boolean overide = false;
 		do {
-			System.out.println("Please select from below options for operation:");
-			System.out.println("1. Display all File");
-			System.out.println("2. Search File(Case Sensitivity)");
-			System.out.println("3. Add File");
-			System.out.println("4. Delete File:");
+			
 			try {
 //				Next Line is used here in scanner otherwise all operation with scanner next to it won't work
-				String value = in.nextLine();
-				int x = Integer.parseInt(value);
+				int x = 0;
+				if(!subClass) {
+					System.out.println("Please select from below options for operation:");
+					System.out.println("1. Display all File");
+					System.out.println("2. Select for Other File Operation");
+					String value = in.nextLine();
+					x = Integer.parseInt(value);
+					
+				} else {
+					x = 2;
+				}
 				File folder = new File("src/main/res");
 
-				if(folder.isDirectory() && folder.exists())
+				if(folder.exists() && folder.isDirectory())
 	            {
 					File[] fileList = folder.listFiles(new FileFilter() {
 						
@@ -57,48 +63,69 @@ public class ProcesMain {
 			                }
 							break;
 						case 2:
+							subClass = true;
+							System.out.println("1. Search File(Case Sensitivity)");
+							System.out.println("2. Add File");
+							System.out.println("3. Delete File:");
+							System.out.println("4. Return to Main Menu");
 							
-							System.out.println("Please enter File you want to find out");
-							String fileName = in.nextLine();
+							String value = in.nextLine();
+							int y = Integer.parseInt(value);
 							
-			                ProcesMain sorter1 = new ProcesMain();
-			                sorter1.sort(fileList);
-			                
-//			                for (File file : fileList) {
-//			                    System.out.println(file.getName());
-//			                }
-			                
-			                int result = sorter1.binarySearch(fileList, fileName);
-			                
-			                if (result == -1)
-			                   throw new FileNotFoundException(fileName + " is not present");
-			                else
-			                    System.out.println("File is present in the Directory");
-			                
-							break;
-						case 3 :
-							System.out.println("Please enter File with path you want to add in this directory");
-							System.out.println("ie windows : D:/abc.txt linux : /var/abc.txt");
-							String addFileName = in.nextLine();
-						    
-							File file = new File(addFileName);
-				            
-				            File copyFilePath = new File(folder.getAbsolutePath() + "/" + file.getName());
-//				            System.out.println(copyFilePath.getAbsolutePath());
-				            if (!copyFilePath.exists()) {
-				                copyFilePath.createNewFile();
-				            }
-				            
-				            copy(file, copyFilePath);
-				            System.out.println("File Copy was successful");
-				            break;
-						case 4:
-							System.out.println("Please enter file you want to delete from Directory");
-							String deleteFileName = in.nextLine();
-							String path = folder.getPath() + "/" + deleteFileName;
-							Path filePath = Paths.get(path);
-							Files.delete(filePath);
-							break;
+							switch(y) {
+								case 1:			
+									System.out.println("Please enter File you want to find out");
+									String fileName = in.nextLine();
+									
+					                ProcesMain sorter1 = new ProcesMain();
+					                sorter1.sort(fileList);
+					                
+		//			                for (File file : fileList) {
+		//			                    System.out.println(file.getName());
+		//			                }
+					                
+					                int result = sorter1.binarySearch(fileList, fileName);
+					                
+					                if (result == -1)
+					                   throw new FileNotFoundException(fileName + " is not present");
+					                else {
+					                    System.out.println("File is present in the Directory");
+					                    System.out.println(fileList[result].toString());
+					                }
+									break;
+								case 2 :
+									System.out.println("Please enter File with path you want to add in this directory");
+									System.out.println("ie windows : D:/abc.txt linux : /var/abc.txt");
+									String addFileName = in.nextLine();
+								    
+									File file = new File(addFileName);
+						            
+						            File copyFilePath = new File(folder.getAbsolutePath() + "/" + file.getName());
+		//				            System.out.println(copyFilePath.getAbsolutePath());
+						            if (!copyFilePath.exists()) {
+						                copyFilePath.createNewFile();
+						            }
+						            
+						            copy(file, copyFilePath);
+						            System.out.println("File Copy was successful");
+						            break;
+								case 3:
+									System.out.println("Please enter file you want to delete from Directory");
+									String deleteFileName = in.nextLine();
+									String path = folder.getPath() + "/" + deleteFileName;
+									Path filePath = Paths.get(path);
+									if(Files.exists(filePath)) {
+										Files.delete(filePath);
+										System.out.println("File Deletion was successful");
+									} else {
+										System.out.println("File Not Found");
+									}
+									break;
+								case 4: 
+									subClass = false;
+									overide = true;
+									break;
+							}
 					}
 	            } else {
 	            	throw new FolderNotFoundException();			            
@@ -109,7 +136,7 @@ public class ProcesMain {
 				bool = false;
 			} 
 			catch (FileNotFoundException e) {
-				System.out.println(e.getMessage());
+				System.out.println("Exception: " +e.getMessage());
 			}catch (IOException e) {
 				System.out.println("File Operation Failure");
 				System.out.println(e.getMessage());
@@ -119,14 +146,16 @@ public class ProcesMain {
 				System.out.println("Something went wrong");
 				bool = false;
 			} finally {
-				if(bool) {
-					System.out.println("Do you want to repeat operation : y/n");
-					String x = in.nextLine();
-//					System.out.println("x : " +x);
-					if(!x.equals("y"))
-							bool = false;
+				if(!overide) {
+					if(bool) {
+						System.out.println("Do you want to repeat operation : y/n");
+						String x = in.nextLine();
+//						System.out.println("x : " +x);
+						if(!x.equals("y"))
+								bool = false;
+					}
 				}
-				
+				overide = false;
 			}
 
 		}while(bool);
